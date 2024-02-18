@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "689320295524",
+    "project_id": "friendcircle-1a28a",
+    "storage_bucket": "friendcircle-1a28a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689320295524:android:391973187be76ee1633371",
+        "android_client_info": {
+          "package_name": "com.example.social_media_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy-8AQW4exB9Tmjq0bLTJRNI6o4zW1maY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
