@@ -4,11 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/Screens/HomeScreen.dart';
 import 'package:social_media_app/Screens/ProbileScreen.dart';
-import 'package:social_media_app/Screens/test.dart';
+import 'package:social_media_app/Screens/StoryView.dart';
 import 'package:stylish_bottom_bar/model/bar_items.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '../Widgets/Story.dart';
+import 'SavedList.dart';
 
 class Navi extends StatefulWidget {
   const Navi({
@@ -116,9 +117,9 @@ class _NaviState extends State<Navi> {
           controller: controller,
           children: const [
             HomeScreen(),
-            test(),            
+             Center(child: Text('Star')),           
             Center(child: Text('Star')),
-            Center(child: Text('Style')),
+            SavedList(),
             ProfileScreen()
           ],
         ),

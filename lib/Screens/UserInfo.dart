@@ -1,10 +1,15 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fast_forms/flutter_fast_forms.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/Blogic/Firebase/FireStore.dart';
 import 'package:social_media_app/Screens/Navi.dart';
 import 'package:social_media_app/theme/AppColors.dart';
-
+import 'package:path/path.dart';
 
 class UserInfo extends StatefulWidget {
   const UserInfo({super.key});
@@ -14,6 +19,8 @@ class UserInfo extends StatefulWidget {
 }
 
 class _UserInfoState extends State<UserInfo> {
+  bool getimage = false;
+
   String firstname = "";
   String lastname = "";
   String username = "";
@@ -23,6 +30,139 @@ class _UserInfoState extends State<UserInfo> {
   String code = "";
   String phonenumber = "";
   bool isOlder16 = false;
+    File? file;
+  TextEditingController title = TextEditingController();
+  String url = "hassan";
+
+  UploadImage_gallery() async {
+    ImagePicker picker = ImagePicker();
+    XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        file = File(image!.path);
+        getimage = true;
+      });
+
+      var metadata = SettableMetadata(
+        contentType: "image/jpeg",
+      );
+      var imgname = basename(image.path);
+      var ref = FirebaseStorage.instance.ref(imgname);
+      await ref.putFile(file!, metadata);
+
+      url = await ref.getDownloadURL();
+    }
+  }
+
+  UploadImage_camera() async {
+    ImagePicker picker = ImagePicker();
+    XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+    if (image != null) {
+      setState(() {
+        file = File(image!.path);
+        getimage = true;
+      });
+
+      var metadata = SettableMetadata(
+        contentType: "image/jpeg",
+      );
+      var imgname = basename(image.path);
+      var ref = FirebaseStorage.instance.ref(imgname);
+      await ref.putFile(file!, metadata);
+
+      url = await ref.getDownloadURL();
+    }
+  }
+
+  Widget upload_way() {
+    return Container(
+      width: 150.w,
+      height: 150.h,
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor,
+        border: Border.all(
+          color: AppColors.primaryColor,
+          width: 2.w,
+        ),
+      ),
+      child: Center(
+          child: Row(
+        children: [
+          SizedBox(
+            width: 10.w,
+          ),
+          GestureDetector(
+            onTap: () async {
+              await UploadImage_gallery();
+            },
+            child: Container(
+              height: 100.h,
+              width: 60.w,
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor,
+                borderRadius: BorderRadius.circular(5.r),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Icon(Icons.image, size: 40, color: AppColors.backgroundColor),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Text(
+                    'Add from gallery',
+                    style: TextStyle(
+                        color: AppColors.backgroundColor,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 10.w,
+          ),
+          GestureDetector(
+            onTap: () async {
+              await UploadImage_camera();
+            },
+            child: Container(
+              height: 100.h,
+              width: 60.w,
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor,
+                borderRadius: BorderRadius.circular(5.r),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Icon(Icons.camera,
+                      size: 40, color: AppColors.backgroundColor),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Text(
+                    'Add from Camera',
+                    style: TextStyle(
+                        color: AppColors.backgroundColor,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      )),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +175,28 @@ class _UserInfoState extends State<UserInfo> {
           SizedBox(
             height: 20.h,
           ),
-          CircleAvatar(
-            radius: 50.r,
-            backgroundImage: NetworkImage("https://i.imgur.com/zZR7pS9.png"),
+          getimage?GestureDetector(
+            onTap: () {
+             
+            },
+            child: CircleAvatar(
+              radius: 50.r,
+              backgroundImage:FileImage(file!),
+            ),
+          ):
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                SmartDialog.show(builder: (context) {
+                        return upload_way();
+                      });
+                    
+              });
+            },
+            child: CircleAvatar(
+              radius: 50.r,
+              backgroundImage:NetworkImage("https://i.imgur.com/zZR7pS9.png"),
+            ),
           ),
           SizedBox(
             height: 20.h,
@@ -267,7 +426,16 @@ class _UserInfoState extends State<UserInfo> {
               GestureDetector(
                 onTap: () {
                   try {
-                 
+                   FireStore.AddUserInfo(
+                        firstname + " " + lastname,
+                        username,
+                        dateofbirth,
+                        country + " " + city,
+                        code + " " + phonenumber,
+                        url,
+                        isOlder16,
+                        [],
+                        []);
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => Navi()));
                   } catch (e) {

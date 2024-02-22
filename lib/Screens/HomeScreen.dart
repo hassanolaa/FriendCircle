@@ -7,6 +7,7 @@ import 'package:social_media_app/Models/Post.dart';
 import 'package:social_media_app/Models/Story.dart';
 import 'package:social_media_app/Screens/NewPost.dart';
 import 'package:social_media_app/Screens/NewStory.dart';
+import 'package:social_media_app/Screens/WelcomeScreen.dart';
 import 'package:social_media_app/Widgets/Post.dart';
 import 'package:social_media_app/Widgets/Story.dart';
 import 'package:social_media_app/theme/AppColors.dart';
@@ -74,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(
-                width: 40.w,
+                width: 20.w,
               ),
               CircleAvatar(
                 radius: 25.r,
@@ -89,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
               ),
               SizedBox(
-                width: 80.w,
+                width: 40.w,
               ),
               IconButton(
                   onPressed: () {},
@@ -101,6 +102,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {},
                   icon: const Icon(
                     Icons.search_outlined,
+                    size: 25,
+                  )),
+                    IconButton(
+                  onPressed: () {
+                    FireStore.auth.signOut();
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>WelcomeScreen()));
+                  },
+                  icon: const Icon(
+                    Icons.logout_outlined,
                     size: 25,
                   )),
             ],

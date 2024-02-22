@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,6 +21,37 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final auth = FirebaseAuth.instance;
+  String fullname = '';
+  String username = '';
+  String userimage = '';
+  int? posts_count;
+
+  Future<void> GetUserInfo() async {
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(auth.currentUser!.uid)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        setState(() {
+          fullname = snapshot.data()!['fullname'];
+          username = snapshot.data()!['username'];
+          userimage = snapshot.data()!['userimage'];
+        });
+      } else {
+        print('No data');
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    GetUserInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,8 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: CircleAvatar(
                       radius: 55.r,
                       backgroundColor: Colors.white,
-                      backgroundImage:
-                          NetworkImage('https://i.imgur.com/zZR7pS9.png'),
+                      backgroundImage: NetworkImage(userimage),
                     ),
                   ),
                 ],
@@ -75,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'John Doe',
+                          username,
                           style: TextStyle(
                               fontSize: 25.sp,
                               fontWeight: FontWeight.bold,
@@ -90,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '@JohnDoedhsk',
+                          '@${fullname}',
                           style: TextStyle(
                               fontSize: 15.sp, color: AppColors.primaryColor),
                         ),
@@ -135,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 5.h,
                     ),
                     Text(
-                      '30',
+                      '$posts_count',
                       style: TextStyle(
                           fontSize: 20.sp,
                           color: AppColors.primaryColor,
@@ -265,25 +296,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 160.h,
                 child: StreamBuilder(
                   stream: FirebaseFirestore.instance
-                      .collection('stories')
+                      .collection('Stories')
+                      .where("userid", isEqualTo: Auth.auth.currentUser!.uid)
                       .snapshots(),
                   builder: (context, snap) {
-                    if (!snap.hasData) {
+                    if (snap.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     }
                     return ListView.builder(
-                      itemCount: 10,
+                      itemCount: snap.data!.docs.length,
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
-                        
                         return Padding(
                           padding: const EdgeInsets.only(right: 10.0),
                           child: StoryWidget(
                             story: Story(
-                                username: "hassan",
-                                userIm: "https://i.imgur.com/zZR7pS9.png",
-                                storyImg: "https://i.imgur.com/zZR7pS9.png"),
+                                username: snap.data!.docs[index]['username'],
+                                userIm: snap.data!.docs[index]['userimage'],
+                                storyImg: snap.data!.docs[index]['storyimage']),
                           ),
                         );
                       },
@@ -314,8 +345,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Container(
                 child: StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection('posts').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('posts')
+                  .where("userid", isEqualTo: Auth.auth.currentUser!.uid)
+                  .snapshots(),
               builder: (context, snap) {
                 if (!snap.hasData) {
                   return CircularProgressIndicator();
@@ -327,21 +360,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3),
                   itemBuilder: (context, index) {
-                    if (snap.data!.docs[index]['userid'] ==
-                        Auth.auth.currentUser!.uid) {
-                      return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ProfilePostWidget(
-                            profile: ProfilePost(
-                              postImg: snap.data!.docs[index]['postimage'],
-                            ),
-                          ));
-                    } else {
-                      return SizedBox(
-                        width: 0,
-                        height: 0,
-                      );
-                    }
+                    posts_count=snap.data!.docs.length;
+                    return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ProfilePostWidget(
+                          profile: ProfilePost(
+                            username: snap.data!.docs[index]['username'],
+                            userimage: snap.data!.docs[index]['userimage'],
+                            posttitle: snap.data!.docs[index]['title'],
+                            postImg: snap.data!.docs[index]['postimage'],
+                          ),
+                        ));
                   },
                 );
               },

@@ -1,8 +1,19 @@
 
 class ProfilePost{
 
-  String postImg;
+  String? postImg;
+  String? username;
+  String? userimage;
   
-  ProfilePost({required this.postImg});
+  String? posttitle;
+  
+  ProfilePost({
+    required this.postImg,
+  required  this.username,
+  required  this.userimage,
+  required  this.posttitle,
+  });
+
+  
 
 }

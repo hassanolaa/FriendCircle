@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../Models/Post.dart';
 import '../Models/ProfilePost.dart';
+import '../Screens/PostView.dart';
 import '../theme/AppColors.dart';
 
 class ProfilePostWidget extends StatefulWidget {
@@ -20,7 +22,14 @@ class _ProfilePostState extends State<ProfilePostWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        //  HomeScreen();
+       Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>PostView(post: Post(username: widget.profile!.username,
+                postImg: widget.profile!.postImg,
+                userImg: widget.profile!.userimage,
+                title: widget.profile!.posttitle,
+                ),) ));
       },
       child: Container(
         decoration: BoxDecoration(

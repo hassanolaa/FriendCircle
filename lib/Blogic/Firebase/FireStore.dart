@@ -43,6 +43,7 @@ class FireStore {
           'userimage':userimage,
           'storyimage':storyimage,
           'date':date,
+          'userid':auth.currentUser!.uid,
       
     });
   }
@@ -60,7 +61,28 @@ class FireStore {
     });
   }
  
+  // static Future<void> AddPostComment(String postid,String comment,String username,String userimage,String date) async {
+  //   await FirebaseFirestore.instance
+  //       .collection('posts').doc(postid).collection('comments').add({
+  //         'comment':comment,
+  //         'username':username,
+  //         'userimage':userimage,
+  //         'date':date,
+  //         'userid':auth.currentUser!.uid,
+      
+  //   });
+  // }
+   static Future<void> AddSavedList(String username,String userimage,String postimage,String date,String title) async {
+    await FirebaseFirestore.instance
+        .collection('Users').doc(auth.currentUser!.uid).collection("saved_list").add({
+           'username':username,
+          'userimage':userimage,
+          'postimage':postimage,
+          'date':date,
+          'title':title,
+          
 
-
+        });
+   }
 
 }
